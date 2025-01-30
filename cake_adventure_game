@@ -1,0 +1,55 @@
+// Phaser 3 Adventure Game Starter
+const config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+    physics: {
+        default: 'arcade',
+        arcade: { debug: false }
+    },
+    scene: [MainMenu, GameScene]
+};
+
+const game = new Phaser.Game(config);
+
+class MainMenu extends Phaser.Scene {
+    constructor() {
+        super('MainMenu');
+    }
+    preload() {
+        this.load.image('background', 'assets/background.png');
+    }
+    create() {
+        this.add.image(400, 300, 'background');
+        this.add.text(300, 100, 'Choose Your Path', { fontSize: '24px', fill: '#fff' });
+        
+        const roles = ['Artist', 'Music Producer', 'Songwriter'];
+        roles.forEach((role, index) => {
+            this.add.text(350, 200 + index * 50, role, { fontSize: '20px', fill: '#ff0' })
+                .setInteractive()
+                .on('pointerdown', () => this.startGame(role));
+        });
+    }
+    startGame(role) {
+        localStorage.setItem('chosenRole', role);
+        this.scene.start('GameScene');
+    }
+}
+
+class GameScene extends Phaser.Scene {
+    constructor() {
+        super('GameScene');
+    }
+    create() {
+        this.add.text(50, 50, `Role: ${localStorage.getItem('chosenRole')}`, { fontSize: '20px', fill: '#fff' });
+        
+        this.player = this.add.rectangle(400, 300, 32, 32, 0x00ff00);
+        this.cursors = this.input.keyboard.createCursorKeys();
+    }
+    update() {
+        if (this.cursors.left.isDown) this.player.x -= 2;
+        if (this.cursors.right.isDown) this.player.x += 2;
+        if (this.cursors.up.isDown) this.player.y -= 2;
+        if (this.cursors.down.isDown) this.player.y += 2;
+    }
+}
